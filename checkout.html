@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap"
+          rel="stylesheet">
+    <title>HyperInk</title>
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="components/cart/cart.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/font-awesome.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+
+<header class="header-area header-sticky mb-2 mt-5"> <!-- Add top padding to the header -->
+    <div class="container fixed-top bg-white">
+        <div id="navbar-container"></div>
+    </div>
+</header>
+
+<style>
+    /* Add custom CSS to push the body content below the header */
+    body {
+        margin-top: 150px; /* Adjust the value to match your header height */
+    }
+</style>
+
+<div class="container">
+
+    <div class="checkout">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-heading">
+                        <h2>Checkout</h2>
+                        <span>Review your items before purchase</span>
+                    </div>
+                    <ul class="cart-items">
+                        <!-- Cart items will be displayed here -->
+                    </ul>
+                    <button id="buy-button" class="btn btn-primary" style="width: 100px;">Buy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="container mt-1 ">
+
+</div>
+
+<div id="footer-container"></div>
+
+<!-- jQuery -->
+<script src="assets/js/jquery-2.1.0.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="assets/js/popper.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+
+<script>
+    // Function to parse URL parameters
+
+
+
+    // Get the cart data from local storage
+    let cartData = JSON.parse(localStorage.getItem('cart')) || [];
+
+    console.log(cartData)
+    // Update the checkout page with cart data from local storage
+    if (cartData.length > 0) {
+        const checkoutList = document.querySelector('.cart-items'); // Assuming you have an element with the class 'cart-items' to display cart items
+
+        // Loop through cart items and build the checkout list
+        cartData.forEach(function(item) {
+            const checkoutItem = document.createElement('li');
+            checkoutItem.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+            checkoutList.appendChild(checkoutItem);
+        });
+    }
+
+    // Function to update the cart display in the checkout page
+    function updateCheckoutDisplay(cartItems) {
+        const cartItemsList = $('.cart-items');
+        cartItemsList.empty();
+
+        if (cartItems.length === 0) {
+            cartItemsList.append('<p>Your cart is empty.</p>');
+        } else {
+            cartItems.forEach(function (item) {
+                const cartItemHtml = `
+                <li>${item.name} - $${item.price.toFixed(2)}</li>
+            `;
+                cartItemsList.append(cartItemHtml);
+            });
+        }
+    }
+
+    // Call the updateCheckoutDisplay function when the page loads
+    $(document).ready(function () {
+        updateCheckoutDisplay(cartData);
+    });
+
+    $('#buy-button').click(function () {
+
+        console.log(cartData)
+
+        const token = localStorage.getItem('token');
+
+        // Check if a token exists
+        if (token) {
+            // Send a POST request to the server with the item names and JWT token in the headers
+            $.ajax({
+                url: 'http://localhost:3001/api/user/create-order', // Replace with your server endpoint
+                method: 'POST',
+                data: JSON.stringify(cartData),
+                contentType: 'application/json',
+                dataType: 'json',
+                headers: {
+                    'Authorization': `Bearer ${token}` // Add the JWT token to the headers
+                },
+                success: function (response) {
+
+                    alert('Purchase successful!');
+
+                    cartData.length = 0;
+                    updateCheckoutDisplay(cartData);
+
+                    localStorage.removeItem('cart');
+                },
+                error: function (error) {
+                    console.error('Error making purchase:', error);
+                },
+            });
+        } else {
+            // Handle the case where there's no token (user is not authenticated)
+            alert('You need to log in to make a purchase.');
+        }
+    });
+
+
+</script>
+
+<!-- Additional JavaScript files (navbar and footer) -->
+<script src="components/navbar/navbar.js"></script>
+<script src="components/footer/footer.js"></script>
+<script src="components/cart/cart.js"></script>
+</body>
+
+</html>

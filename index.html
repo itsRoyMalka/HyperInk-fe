@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap"
+          rel="stylesheet">
+    <title>HyperInk</title>
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="components/cart/cart.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<header class="header-area header-sticky mb-2 mt-5"> <!-- Add top padding to the header -->
+    <div class="container fixed-top bg-white">
+        <div id="navbar-container"></div>
+    </div>
+</header>
+
+
+<body >
+
+
+<style>
+    /* Add custom CSS to push the body content below the header */
+    body {
+        margin-top: 150px; /* Adjust the value to match your header height */
+    }
+</style>
+
+
+<!-- Search -->
+<div class="container">
+
+    <div class="row" id="search">
+        <div class="col-md-6">
+            <div class="input-group mb-3">
+                <input type="text" id="search-input" class="form-control" placeholder="Search for products" aria-label="Search for products" aria-describedby="search-button">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="search-button">Search</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="input-group mb-3">
+                <select class="custom-select" id="category-filter">
+                    <option value="all">All Categories</option>
+                    <option value="shirts">shirts</option>
+                    <option value="hats">hats</option>
+                    <option value="pants">pants</option>
+                    <option value="shoes">shoes</option>
+
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="input-group mb-3">
+                <input type="number" value="0" class="form-control" placeholder="Min" aria-label="Min Price" id="min-price">
+                <input type="number" class="form-control" placeholder="Max" aria-label="Max Price" id="max-price">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container mt-1 ">
+    <div class="row" id="products"></div>
+</div>
+
+
+
+
+
+
+
+<div id="footer-container"></div>
+
+
+<div id="cart"></div>
+
+
+
+
+<!-- jQuery -->
+<script src="assets/js/jquery-2.1.0.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="assets/js/popper.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+
+<!-- Your JavaScript for fetching and rendering products -->
+<script>
+
+    function fetchAndRenderAllProducts() {
+        $.ajax({
+                url: 'https://hyperink-be.onrender.com/api/public/get-all-items',
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+
+                renderProducts(data);
+            },
+            error: function (error) {
+                console.error('Error fetching products:', error);
+            },
+        });
+    }
+
+
+    function searchAndRenderProducts(searchParams) {
+        $.ajax({
+            url: 'https://hyperink-be.onrender.com/api/public/get-items-by-category-and-price',
+            method: 'POST',
+            data: JSON.stringify(searchParams),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (data) {
+
+                renderProducts(data);
+            },
+            error: function (error) {
+                console.error('Error searching for products:', error);
+            },
+        });
+    }
+
+    // Function to render products
+    function renderProducts(data) {
+        if (Array.isArray(data)) {
+            var productsContainer = $('#products');
+            productsContainer.empty(); // Clear existing content
+
+            data.forEach(function (product) {
+                var productHtml = `
+                <div class="col-lg-4">
+                    <div class="item">
+                        <div class="thumb">
+                            <div class="hover-content">
+                                <ul>
+                                    <li>
+                                        <a href="#" class="add-to-cart-button"
+                                           data-item-name="${product.name}"
+                                           data-item-price="${product.price.toFixed(2)}"
+                                           data-item-image="${product.imageUrl}"
+                                           data-item-id="${product._id}"
+                                        >
+                                            <i class="fa fa-shopping-cart"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div style="width: 200px; height: 300px;">
+                                <img src="${product.imageUrl}" alt="${product.name}" style="width: 100%; height: 100%;">
+                               </div>
+
+                        </div>
+                        <div class="down-content">
+                            <h4>${product.name}</h4>
+                            <span>$${product.price.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+                productsContainer.append(productHtml);
+            });
+        }
+    }
+
+
+    // Call fetchAndRenderAllProducts to load all products when the page loads
+    $(document).ready(function () {
+        fetchAndRenderAllProducts();
+    });
+
+    // Add an event listener to the search button
+    $('#search-button').click(function () {
+        var searchTerm = $('#search-input').val();
+        var categoryFilter = $('#category-filter').val() || 'all';
+        var maxPrice = $('#max-price').val() || 99999;
+        var minPrice = $('#min-price').val() || 0;
+
+
+        var searchParams = {
+            params: searchTerm,
+            categoryName: categoryFilter,
+            minPrice: minPrice,
+            maxPrice: maxPrice,
+        };
+
+        searchAndRenderProducts(searchParams);
+    });
+</script>
+
+<script>
+
+</script>
+
+
+
+<!-- Additional JavaScript files (navbar and footer) -->
+<script src="components/navbar/navbar.js"></script>
+<script src="components/footer/footer.js"></script>
+<script src="components/cart/cart.js"></script>
+</body>
+
+</html>
