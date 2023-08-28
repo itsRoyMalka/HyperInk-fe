@@ -119,7 +119,7 @@
         if (token) {
             // Send a POST request to the server with the item names and JWT token in the headers
             $.ajax({
-                url: 'http://localhost:3001/api/user/create-order', // Replace with your server endpoint
+                url: 'https://hyperink-be/api/user/create-order', // Replace with your server endpoint
                 method: 'POST',
                 data: JSON.stringify(cartData),
                 contentType: 'application/json',
