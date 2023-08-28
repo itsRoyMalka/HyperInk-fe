@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap"
+    rel="stylesheet">
+  <title>HyperInk</title>
+
+  <!-- Additional CSS Files -->
+  <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+  <!--<link rel="stylesheet" type="text/css" href="assets/css/font-awesome.css">-->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+  <header class="header-area header-sticky">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 ">
+          <div id="navbar-container"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container mt-5">
+    <div class="row" id="user-panel">
+      <!-- User's Order History Cards will be dynamically added here -->
+    </div>
+  </div>
+  <script>
+    // Function to fetch and update user's order history
+    function fetchUserOrderHistory() {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        // Handle the case where there's no token (user is not authenticated)
+        console.log('User is not authenticated.');
+        return;
+      }
+
+      fetch('https://hyperink-be.onrender.com/api/user/get-orders', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          const userPanel = document.getElementById('user-panel');
+          userPanel.innerHTML = ''; // Clear existing data
+          console.log(data);
+
+          data.forEach(order => {
+            const orderCard = document.createElement('div');
+            orderCard.classList.add('order-card');
+            orderCard.innerHTML = `
+            <h3>Order ID: ${order.id}</h3>
+            <p>Date: ${order.date}</p>
+            <ul>
+              ${order.items.map(item => `
+                <li>
+                  <div>
+                    <img src="${item.imageUrl}" alt="${item.name}" class="product-image">
+                  </div>
+                  <div>
+                    <p>Product Name: ${item.name}</p>
+                    <p>Product Price: ${item.price}</p>
+                    <p>Category: ${item.category}</p>
+                  </div>
+                </li>
+              `).join('')}
+            </ul>
+          `;
+            userPanel.appendChild(orderCard);
+          });
+        });
+    }
+
+    // Fetch and update user's order history on page load
+    fetchUserOrderHistory();
+  </script>
+</body>
+
+
+
+<div id="footer-container"></div>
+
+<!-- jQuery -->
+<script src="assets/js/jquery-2.1.0.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="assets/js/popper.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+
+<!-- Your JavaScript for fetching and rendering products -->
+
+
+
+<!-- Additional JavaScript files (navbar and footer) -->
+<script src="components/navbar/navbar.js"></script>
+<script src="components/footer/footer.js"></script>
+<script src="components/cart/cart.js"></script>

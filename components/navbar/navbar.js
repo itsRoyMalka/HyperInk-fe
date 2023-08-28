@@ -53,9 +53,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const adminLinkContainer = document.getElementById('control-panel-link-container');
 
         if(admin){
-            adminLinkContainer.innerHTML = '<a href="admin.html">admin</a>';
+            adminLinkContainer.innerHTML = '<a href="admin_panel.html">admin</a>';
         }else if(token){
-            adminLinkContainer.innerHTML = '<a href="user.html">User</a>';
+            adminLinkContainer.innerHTML = '<a href="user_panel.html">User</a>';
         }
 
 

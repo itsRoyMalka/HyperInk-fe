@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Products</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;300;400;600;700;900&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Source Sans Pro', sans-serif;
+    }
+
+    body {
+      width: 100%;
+      height: 100vh;
+      background: rgb(240, 239, 243);
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 375px;
+      height: 520px;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 4px 4px 30px rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      overflow-y: scroll;
+    }
+
+    .container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .container form {
+      width: 100%;
+      border: 1px solid rgb(82, 74, 235);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .container form input {
+      border: none;
+      outline: none;
+      box-shadow: none;
+      width: 100%;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 8px 10px;
+    }
+
+    .container form i {
+      padding-left: 10px;
+    }
+
+    .container {
+      padding: 20px 0;
+    }
+
+    .pro {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      padding-bottom: 15px;
+    }
+
+    .pro img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+
+    .pro .description {
+      padding-left: 15px;
+    }
+
+    .pro .description h2 {
+      font-size: 20px;
+      color: #1d1d1d;
+    }
+
+    .pro .description p {
+      font-size: 18px;
+    }
+
+    label,
+    input,
+    textarea {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    input[type="submit"],
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    button#deleteButton {
+      background-color: #dc3545;
+      margin-top: 12px;
+    }
+
+    .fal {
+      padding-left: 50px;
+    }
+
+    .material-icons-sharp {
+      padding-left: 50px;
+    }
+
+    #productForm {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+
+    .icons-container {
+      display: flex;
+      gap: 1px;
+    }
+  </style>
+</head>
+
+<body>
+  <section class="add-product">
+    <form id="productForm" onsubmit="addProduct(event)">
+      <label for="name"><b>Product Name:</b></label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="category"><b>Category:</b></label>
+      <input type="text" id="category" name="category">
+
+      <label for="colors"><b>Color:</b></label>
+      <input type="text" id="color-input" name="colors">
+
+      <label for="size"><b>Size:</b></label>
+      <input type="text" id="size-input" name="size">
+
+      <label for="quantity"><b>Quantity:</b></label>
+      <input type="text" id="stock-input" name="stock">
+
+      <label for="price"><b>Price:</b></label>
+      <input type="text" id="price-input" name="price">
+
+      <label for="imageUrl"><b>Image URL:</b></label>
+      <input type="text" id="imageUrl" name="imageUrl">
+
+      <label for="description"><b>Description:</b></label>
+      <textarea id="description" name="description"></textarea>
+
+      <button type="submit"><b>Add Product</b></button>
+    </form>
+  </section>
+  <script>
+    function addProduct(event) {
+      event.preventDefault();
+
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        alert('You need to be logged in to add a product.');
+        return;
+      }
+
+      const name = document.getElementById("name").value;
+      const category = document.getElementById("category").value;
+      const colors = document.getElementById("color-input").value.split(",");
+      const size = document.getElementById("size-input").value;
+      const quantity = parseInt(document.getElementById("stock-input").value);
+      const price = parseFloat(document.getElementById("price-input").value);
+      const imageUrl = document.getElementById("imageUrl").value;
+      const description = document.getElementById("description").value;
+
+      const data = {
+        name,
+        category,
+        colors,
+        size,
+        quantity,
+        price,
+        imageUrl,
+        description
+      };
+
+      fetch('https://hyperink-be.onrender.com/api/admin/add-item', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log("API response:", data);
+
+          if (data.success) {
+            alert("Product added successfully!");
+          } else {
+            console.log('Adding product failed:', data.message);
+          }
+        })
+        .catch(error => {
+          console.error('An error occurred:', error);
+        });
+    }
+  </script>
+</body>
+
+</html>

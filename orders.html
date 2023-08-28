@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="eng">
+
+<head>
+  <title>Orders Page</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+
+    header {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 15px;
+    }
+
+    .orders-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .order {
+      border: 1px solid #ddd;
+      background-color: white;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 15px;
+      width: 400px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+
+    .order:hover {
+      transform: translateY(-5px);
+    }
+
+    .order-details p {
+      margin: 0;
+      padding: 4px 0;
+    }
+
+    .item-details {
+      border-top: 1px solid #ddd;
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Orders</h1>
+  </header>
+
+  <div class="orders-container" id="ordersContainer">
+    <!-- Orders will be dynamically added here -->
+  </div>
+
+
+  <script>
+    const ordersContainer = document.getElementById("ordersContainer");
+
+    function createOrderElement(orderData) {
+      const orderDiv = document.createElement('div');
+      orderDiv.classList.add('order');
+
+      const orderDetailsDiv = document.createElement('div');
+      orderDetailsDiv.classList.add('order-details');
+
+      const orderIdParagraph = document.createElement('p');
+      orderIdParagraph.textContent = `Order ID: ${orderData.id}`;
+      orderDetailsDiv.appendChild(orderIdParagraph);
+
+      const orderDateParagraph = document.createElement('p');
+      const orderDate = new Date(orderData.date).toLocaleDateString();
+      orderDateParagraph.textContent = `Order Date: ${orderDate}`;
+      orderDetailsDiv.appendChild(orderDateParagraph);
+
+      orderData.items.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item-details');
+
+        const itemNameParagraph = document.createElement('p');
+        itemNameParagraph.textContent = `Item: ${item.name}`;
+        itemDiv.appendChild(itemNameParagraph);
+
+        const itemPriceParagraph = document.createElement('p');
+        itemPriceParagraph.textContent = `Price: ${item.price}`;
+        itemDiv.appendChild(itemPriceParagraph);
+
+        const itemImage = document.createElement('img');
+        itemImage.src = item.imageUrl;
+        itemImage.alt = item.name;
+        itemImage.style.maxWidth = "100px"; // Adjust image size if needed
+        itemDiv.appendChild(itemImage);
+
+        const itemCategoryParagraph = document.createElement('p');
+        itemCategoryParagraph.textContent = `Category: ${item.category}`;
+        itemDiv.appendChild(itemCategoryParagraph);
+
+        orderDetailsDiv.appendChild(itemDiv);
+      });
+
+      orderDiv.appendChild(orderDetailsDiv);
+
+      return orderDiv;
+    }
+
+    function fetchOrders() {
+      const token = localStorage.getItem('token'); // Change to the correct token key
+
+      if (!token) {
+        alert('You need to be logged in to view orders.');
+        return;
+      }
+
+      fetch('https://hyperink-be.onrender.com/api/admin/get-all-orders', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log("API response:", data);
+
+          data.forEach(order => {
+            const orderElement = createOrderElement(order);
+            ordersContainer.appendChild(orderElement);
+          });
+        })
+        .catch(error => {
+          console.error('An error occurred:', error);
+        });
+    }
+
+    // Call the fetchOrders function to get and display orders
+    fetchOrders();
+  </script>
+</body>
+
+</html>
