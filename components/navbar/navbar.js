@@ -1,14 +1,38 @@
 // load-navbar.js
 
 function logout() {
+
     localStorage.removeItem('token');
     localStorage.removeItem('admin');
+
+
+    fetch('https://hyperink-be.onrender.com//api/auth/logout', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+
+        },
+
+    })
+        .then(response => {
+            if (response.ok) {
+
+                window.location.href = '/home';
+            } else {
+
+                console.error('Logout failed:', response.statusText);
+            }
+        })
+        .catch(error => {
+            console.error('Error during logout:', error);
+        });
 }
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // Fetch the navbar.html content from the same folder
-        const response = await fetch('components/navbar/navbar.html'); // No need for "./" in the path
+
+        const response = await fetch('components/navbar/navbar.html');
 
 
         if (!response.ok) {
